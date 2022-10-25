@@ -73,6 +73,8 @@ def operators(node, repeatedStates):
                 jLoc = j
     
     if iLoc < 2:
+        #deepcopy is used to ensure our parent board is not changed for all operator permutations
+        #https://docs.python.org/3/library/copy.html
         board = deepcopy(node.puzzle)
         temp = board[iLoc+1][jLoc]
         board[iLoc+1][jLoc] = board[iLoc][jLoc]
