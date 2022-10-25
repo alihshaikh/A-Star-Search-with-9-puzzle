@@ -10,7 +10,7 @@ class Node:
         self.children = []
 
 
-defaultPuzzle = [[1,2,0], [4,5,3], [7,8,6]]
+defaultPuzzle = [[1,2,3], [4,8,0], [7,6,5]]
 
 def main():
     print("*****Eight Puzzle Solver*****")
@@ -76,9 +76,7 @@ def operators(node, repeatedStates):
         #deepcopy is used to ensure our parent board is not changed for all operator permutations
         #https://docs.python.org/3/library/copy.html
         board = deepcopy(node.puzzle)
-        temp = board[iLoc+1][jLoc]
-        board[iLoc+1][jLoc] = board[iLoc][jLoc]
-        board[iLoc][jLoc] = temp
+        upOperator(board,iLoc,jLoc)
         
         if board not in repeatedStates:
             node.children.append(Node(board))
@@ -86,9 +84,7 @@ def operators(node, repeatedStates):
 
     if iLoc > 0:
         board = deepcopy(node.puzzle)
-        temp = board[iLoc-1][jLoc]
-        board[iLoc-1][jLoc] = board[iLoc][jLoc]
-        board[iLoc][jLoc] = temp
+        downOperator(board, iLoc, jLoc)
 
         if board not in repeatedStates:
             node.children.append(Node(board))
@@ -96,9 +92,7 @@ def operators(node, repeatedStates):
 
     if jLoc < 2:
         board = deepcopy(node.puzzle)
-        temp = board[iLoc][jLoc+1]
-        board[iLoc][jLoc+1] = board[iLoc][jLoc]
-        board[iLoc][jLoc] = temp
+        rightOperator(board, iLoc, jLoc)
 
         if board not in repeatedStates:
             node.children.append(Node(board))
@@ -106,16 +100,33 @@ def operators(node, repeatedStates):
 
     if jLoc > 0:
         board = deepcopy(node.puzzle)
-        temp = board[iLoc][jLoc-1]
-        board[iLoc][jLoc-1] = board[iLoc][jLoc]
-        board[iLoc][jLoc] = temp
+        leftOperator(board, iLoc, jLoc)
 
         if board not in repeatedStates:
             node.children.append(Node(board))
             repeatedStates.append(board)
 
+#moves blank space in 8 puzzle in upwards direction
+def upOperator(board, iLoc, jLoc):
+    temp = board[iLoc+1][jLoc]
+    board[iLoc+1][jLoc] = board[iLoc][jLoc]
+    board[iLoc][jLoc] = temp
+#moves blank space in 8 puzzle in downwards direction    
+def downOperator(board, iLoc, jLoc):
+    temp = board[iLoc-1][jLoc]
+    board[iLoc-1][jLoc] = board[iLoc][jLoc]
+    board[iLoc][jLoc] = temp
+#moves blank space in 8 puzzle in right direction
+def rightOperator(board, iLoc, jLoc):
+    temp = board[iLoc][jLoc+1]
+    board[iLoc][jLoc+1] = board[iLoc][jLoc]
+    board[iLoc][jLoc] = temp
+#moves blank space in 8 puzzle in left direction
+def leftOperator(board, iLoc, jLoc):
+    temp = board[iLoc][jLoc-1]
+    board[iLoc][jLoc-1] = board[iLoc][jLoc]
+    board[iLoc][jLoc] = temp
 
-    
 #used to compare current state puzzle with goal state. returns true if current state = goal state
 def solved(puzzle):
     if puzzle == [[1,2,3],[4,5,6],[7,8,0]]:
