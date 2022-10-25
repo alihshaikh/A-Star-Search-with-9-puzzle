@@ -1,122 +1,125 @@
-import heapq
 from collections import deque
-from re import L
-from copy import copy, deepcopy
+from copy import deepcopy
 
-
-class TreeNode:
-    def __init__(self, boardData, i, j):
+#Node class created holding puzzle current state data, h(n) heuristic value, g(n) heuristic value, and array of children Nodes
+class Node:
+    def __init__(self, puzzle):
+        self.puzzle = puzzle
+        self.hn = 0
+        self.gn = 0
         self.children = []
-        self.data = boardData
-        self.i = i
-        self.j = j
 
-trivial = [[1,2,3], [4,5,6], [7,8,0]]
 
-veryEasy = [[1,2,3], [4,5,6], [7,0,8]]
-
-easy = [[1,2,0], [4,5,3], [7,8,6]]
-
-doable = [[0, 1, 2],
-[4, 5, 3],
-[7, 8, 6]]
-oh_boy = [[8, 7, 1],
-[6, 0, 2],
-[5, 4, 3]]
-
-eightGoalState = [[1,2,3],[4,5,6],[7,8,0]]
+defaultPuzzle = [[1,2,0], [4,5,3], [7,8,6]]
 
 def main():
-    # puzzleMode = input('8-puzzle solver. Please choose one of the following options:' + '\n')
+    print("*****Eight Puzzle Solver*****")
+    
+    userInput = input("Input 1 to use a default puzzle. Input 2 to create your own puzzle." + '\n')
+    puzzle = None
+
+    if int(userInput) == 1:
+        puzzle = defaultPuzzle
+    elif int(userInput) == 2:
+        print('to implement!')
+    
+    print("*****Algorithm Selector*****")
+    
+    algoInput = input("Type the number for the corresponding algorthm option: Uniform Cost Search: 1, Misplaced Tile Heuristic: 2, Manhattan Distance Heuristic: 3" + '\n')
+
+    #Given input, pass in 1,2, or 3, indicating what kind of "heuristic" to use in our search algorith,
+    if int(algoInput) == 1:
+        general_search(puzzle, 1)
+    elif int(algoInput) == 2:
+        general_search(puzzle, 2)
+    elif int(algoInput) == 3:
+        general_search(puzzle,3)
+
+#CS170 "General" Search Algorithm which is tailored based on the input "queueing_function"
+def general_search(puzzle, queueing_function):
+    #array to store our states that have been seen. used to determine if current expansion node state is a duplicate.
+    repeatedStates = []
+    #deque library used as our queue https://docs.python.org/3/library/collections.html
+    queue = deque()
+
+    root = Node(puzzle)
+    queue.append(root)
+
+    while True:
+        if len(queue) == 0:
+            print ("failure")
+            return
+        
+        node = queue.popleft()
+        print(node.puzzle)
+        if solved(node.puzzle):
+            print ('solved!!!')
+            return
+        
+        operators(node, repeatedStates)
+        for i in node.children:
+            queue.append(i)
+
+#general operators function testing 4 directional movement of blank space in 8 puzzle
+def operators(node, repeatedStates):
+    iLoc = 0
+    jLoc = 0
+    
+    #find index [i,j] of 0 in the puzzle
+    for i in range(3):
+        for j in range(3):
+            if node.puzzle[i][j] == 0:
+                iLoc = i
+                jLoc = j
+    
+    if iLoc < 2:
+        board = deepcopy(node.puzzle)
+        temp = board[iLoc+1][jLoc]
+        board[iLoc+1][jLoc] = board[iLoc][jLoc]
+        board[iLoc][jLoc] = temp
+        
+        if board not in repeatedStates:
+            node.children.append(Node(board))
+            repeatedStates.append(board)
+
+    if iLoc > 0:
+        board = deepcopy(node.puzzle)
+        temp = board[iLoc-1][jLoc]
+        board[iLoc-1][jLoc] = board[iLoc][jLoc]
+        board[iLoc][jLoc] = temp
+
+        if board not in repeatedStates:
+            node.children.append(Node(board))
+            repeatedStates.append(board)
+
+    if jLoc < 2:
+        board = deepcopy(node.puzzle)
+        temp = board[iLoc][jLoc+1]
+        board[iLoc][jLoc+1] = board[iLoc][jLoc]
+        board[iLoc][jLoc] = temp
+
+        if board not in repeatedStates:
+            node.children.append(Node(board))
+            repeatedStates.append(board)
+
+    if jLoc > 0:
+        board = deepcopy(node.puzzle)
+        temp = board[iLoc][jLoc-1]
+        board[iLoc][jLoc-1] = board[iLoc][jLoc]
+        board[iLoc][jLoc] = temp
+
+        if board not in repeatedStates:
+            node.children.append(Node(board))
+            repeatedStates.append(board)
+
 
     
-    uniformCostSearch(doable)
-
-
-def uniformCostSearch(board):
-    startingI = None
-    startingJ = None
-    for i in range(len(board)):
-        for j in range(len(board[i])):
-            if board[i][j] == 0:
-                startingI = i
-                startingJ = j
-                
-
-    startNode = TreeNode(board, startingI, startingJ)
-    repeatedStates = {} # dictionary (hashmap) used to avoid exploring redundant (similar) states. O(1) lookup O(n) space.
-    queue = deque()
-    queue.append(startNode)
-#    >>> tuple(map(tuple, arr))
-    repeatedStates[tuple(map(tuple,startNode.data))] = "this is the root board"
-    numCount = 1
-    while queue:
-        cur = queue.popleft()
-        if solved(cur.data):
-            print('solved')
-            print('total nodes in search space: ')
-            print(numCount)
-            break
-        else:
-            numCount +=1
-        if cur.i < len(cur.data)-1:
-            copyBoard = deepcopy(cur.data)
-            cur.children.append(downOperator(copyBoard, cur.i, cur.j))
-            # queue.append(downOperator(cur.data, i, j))
-
-        if cur.i > 0:
-            copyBoard = deepcopy(cur.data)
-            cur.children.append(upOperator(copyBoard, cur.i, cur.j)) 
-            # queue.append(upOperator(cur.data, i, j))
-
-        if cur.j < len(cur.data[cur.i])-1:
-            copyBoard = deepcopy(cur.data)
-            cur.children.append(rightOperator(copyBoard, cur.i, cur.j))
-            # queue.append(rightOperator(cur.data, i, j))
-
-        if cur.j > 0:
-            copyBoard = deepcopy(cur.data)
-            cur.children.append(leftOperator(copyBoard, cur.i, cur.j))
-            # queue.append(leftOperator(cur.data, i, j))
-
-        for instance in cur.children:
-            queue.append(instance)
-
-
-
-# [1,2,3]
-# [4,5,6]
-# [7,0,8]
-#curI = 2
-#curJ = 1
-def downOperator(board, i, j):
-    temp = board[i+1][j]
-    board[i+1][j] = board[i][j]
-    board[i][j] = temp
-    return TreeNode(board, i+1 ,j)
-
-def upOperator(board,i,j):
-    temp = board[i-1][j]
-    board[i-1][j] = board[i][j]
-    board[i][j] = temp
-    return TreeNode(board, i-1 ,j)
-
-def rightOperator(board,i,j):
-    temp = board[i][j+1]
-    board[i][j+1] = board[i][j]
-    board[i][j] = temp
-    return TreeNode(board, i, j+1)
-
-def leftOperator(board,i,j):
-    temp = board[i][j-1]
-    board[i][j-1] = board[i][j]
-    board[i][j-1] = temp
-    return TreeNode(board, i, j-1)
-
-
-def solved(board):
-    if board == eightGoalState:
+#used to compare current state puzzle with goal state. returns true if current state = goal state
+def solved(puzzle):
+    if puzzle == [[1,2,3],[4,5,6],[7,8,0]]:
         return True
     return False
 
-main()
+
+if __name__ == "__main__":
+    main()
