@@ -9,7 +9,7 @@ class Node:
         self.children = []
 
 
-defaultPuzzle = [[8,7,1], [6,0,2], [5,4,3]]
+defaultPuzzle = [[4,1,2],[5,3,0], [7,8,6]]
 
 
 def main():
@@ -32,7 +32,7 @@ def main():
         rowTwo = rowTwo.split()
         rowThree = rowThree.split()
 
-        for i in range(0,3):
+        for i in range(len(rowOne)):
             rowOne[i] = int(rowOne[i])
             rowTwo[i] = int(rowTwo[i])
             rowThree[i] = int(rowThree[i])
@@ -81,6 +81,7 @@ def general_search(puzzle, queueing_function):
             
             node = queue[0]
             queue.pop(0)
+            nodesExpanded +=1
             
             print("The best state to expand with g(n) = " + str(node.depth) + " and h(n) = " + str(node.hn) + " is: ")
             print(node.puzzle)
@@ -97,7 +98,7 @@ def general_search(puzzle, queueing_function):
 
             for i in node.children:
                 queue.append(i)
-            nodesExpanded +=1
+            
 
 #general operators function testing 4 directional movement of blank space in 8 puzzle
 def operators(node, repeatedStates, queueing_function, nodesExpanded):
@@ -105,8 +106,8 @@ def operators(node, repeatedStates, queueing_function, nodesExpanded):
     jLoc = 0
 
     #find index [i,j] of 0 in the puzzle
-    for i in range(3):
-        for j in range(3):
+    for i in range(len(node.puzzle)):
+        for j in range(len(node.puzzle)):
             if node.puzzle[i][j] == 0:
                 iLoc = i
                 jLoc = j
@@ -195,8 +196,8 @@ def misplaced(board):
     numMisplaced = 0
     comparisonBoard = [[1,2,3],[4,5,6],[7,8,0]]
 
-    for i in range(3):
-        for j in range(3):
+    for i in range(len(board)):
+        for j in range(len(board)):
             if board[i][j] == 0:
                 continue
             if board[i][j] != comparisonBoard[i][j]:
@@ -214,8 +215,8 @@ def manhattan(board):
 
     realLocation = {1: [0,0], 2: [0,1], 3: [0,2], 4: [1,0], 5: [1,1], 6: [1,2], 7: [2,0], 8: [2,1]}
 
-    for i in range(3):
-        for j in range(3):
+    for i in range(len(board)):
+        for j in range(len(board)):
             if board[i][j] != comparisonBoard[i][j] and board[i][j] != 0:
                 realRow = realLocation[board[i][j]][0]
                 realCol = realLocation[board[i][j]][1]
