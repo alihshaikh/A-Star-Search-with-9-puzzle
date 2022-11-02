@@ -21,7 +21,7 @@ def main():
     if int(userInput) == 1:
         puzzle = defaultPuzzle
     elif int(userInput) == 2:
-        print("Create your own puzzle using a zero to represent the blank tile. " + "Please only enter valid 8-puzzles. Sepa2rate each value with a space and hit ENTER after inputting each row" + '\n')
+        print("Create your own puzzle using a zero to represent the blank tile. " + "Please only enter valid 8-puzzles. Separate each value with a space and hit ENTER after inputting each row" + '\n')
 
         #input() was faulty -- used raw_input() to fix issue. https://stackoverflow.com/questions/17611391/python-invalid-syntax-on-line-1-file-string 
         rowOne = raw_input('Enter the first row: ')
