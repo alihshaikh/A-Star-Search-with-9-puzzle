@@ -58,8 +58,10 @@ def general_search(puzzle, queueing_function):
     repeatedStates = []
     largestSizeOfQueue = -1
     nodesExpanded = 0
+    #queue stores our explored nodes, where we will pop off from based on heuristic
     queue = []
 
+    #Algorithm Heuristic Selector
     if queueing_function == 3:
         root = Node(puzzle, manhattan(puzzle), 0)
     if queueing_function == 2:
@@ -70,10 +72,11 @@ def general_search(puzzle, queueing_function):
     queue.append(root)
 
     while True:
+            #if length of our queue is 0, then we know there is NO SOLUTION!
             if len(queue) == 0:
                 print ("failure")
                 return
-            
+        
             largestSizeOfQueue = max(largestSizeOfQueue, len(queue))
             if queueing_function == 2 or queueing_function == 3:
                 #use lambda function to sort queue (array) with respect to object attributes https://stackoverflow.com/questions/403421/how-to-sort-a-list-of-objects-based-on-an-attribute-of-the-objects
@@ -94,8 +97,10 @@ def general_search(puzzle, queueing_function):
                 print('Max queue size was ' + str(largestSizeOfQueue))
                 return
             
+            #function call to execute and return all expandable nodes using our operators
             operators(node, repeatedStates, queueing_function, nodesExpanded)
 
+            #appends the expanded nodes children and inserts into queue
             for i in node.children:
                 queue.append(i)
             
@@ -213,6 +218,7 @@ def manhattan(board):
     realRow = 0
     realCol = 0
 
+    #map used to find and retreive originial location of each number tile in the board
     realLocation = {1: [0,0], 2: [0,1], 3: [0,2], 4: [1,0], 5: [1,1], 6: [1,2], 7: [2,0], 8: [2,1]}
 
     for i in range(len(board)):
